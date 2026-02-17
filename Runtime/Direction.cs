@@ -2,33 +2,91 @@ using System;
 using UnityEngine;
 
 [Flags] // Allows bitwise combinations
+/// <summary>
+/// Represents cardinal and diagonal directions that can be combined with bit flags.
+/// </summary>
 public enum Direction
 {
+    /// <summary>
+    /// No direction.
+    /// </summary>
     None = 0,
+    /// <summary>
+    /// Up direction.
+    /// </summary>
     Up = 1,
+    /// <summary>
+    /// Down direction.
+    /// </summary>
     Down = 2,
+    /// <summary>
+    /// Left direction.
+    /// </summary>
     Left = 4,
+    /// <summary>
+    /// Right direction.
+    /// </summary>
     Right = 8,
+    /// <summary>
+    /// Up-left diagonal direction.
+    /// </summary>
     UpLeft = Up | Left,
+    /// <summary>
+    /// Up-right diagonal direction.
+    /// </summary>
     UpRight = Up | Right,
+    /// <summary>
+    /// Down-left diagonal direction.
+    /// </summary>
     DownLeft = Down | Left,
+    /// <summary>
+    /// Down-right diagonal direction.
+    /// </summary>
     DownRight = Down | Right
 }
 
+/// <summary>
+/// Provides helper methods for converting and transforming <see cref="Direction"/> values.
+/// </summary>
 public static class DirectionExtensions
 {
+    /// <summary>
+    /// Checks whether the direction includes an up component.
+    /// </summary>
+    /// <param name="direction">The direction to inspect.</param>
+    /// <returns><see langword="true"/> if it includes up; otherwise <see langword="false"/>.</returns>
     public static bool IsUp(this Direction direction)
         => direction.HasFlag(Direction.Up);
 
+    /// <summary>
+    /// Checks whether the direction includes a down component.
+    /// </summary>
+    /// <param name="direction">The direction to inspect.</param>
+    /// <returns><see langword="true"/> if it includes down; otherwise <see langword="false"/>.</returns>
     public static bool IsDown(this Direction direction)
         => direction.HasFlag(Direction.Down);
 
+    /// <summary>
+    /// Checks whether the direction includes a left component.
+    /// </summary>
+    /// <param name="direction">The direction to inspect.</param>
+    /// <returns><see langword="true"/> if it includes left; otherwise <see langword="false"/>.</returns>
     public static bool IsLeft(this Direction direction)
         => direction.HasFlag(Direction.Left);
 
+    /// <summary>
+    /// Checks whether the direction includes a right component.
+    /// </summary>
+    /// <param name="direction">The direction to inspect.</param>
+    /// <returns><see langword="true"/> if it includes right; otherwise <see langword="false"/>.</returns>
     public static bool IsRight(this Direction direction)
         => direction.HasFlag(Direction.Right);
 
+    /// <summary>
+    /// Flips left and right components while preserving vertical components.
+    /// </summary>
+    /// <param name="direction">The direction to flip.</param>
+    /// <returns>The horizontally flipped direction.</returns>
     public static Direction FlipHorizontally(this Direction direction)
     {
         Direction flippedDirection = direction;
@@ -45,6 +103,11 @@ public static class DirectionExtensions
         return flippedDirection;
     }
 
+    /// <summary>
+    /// Flips up and down components while preserving horizontal components.
+    /// </summary>
+    /// <param name="direction">The direction to flip.</param>
+    /// <returns>The vertically flipped direction.</returns>
     public static Direction FlipVertically(this Direction direction)
     {
         Direction flippedDirection = direction;
@@ -61,6 +124,11 @@ public static class DirectionExtensions
         return flippedDirection;
     }
 
+    /// <summary>
+    /// Converts a direction to an angle in degrees.
+    /// </summary>
+    /// <param name="direction">The direction to convert.</param>
+    /// <returns>The matching angle in degrees, or <see langword="null"/> for unsupported values.</returns>
     public static float? ToAngle(this Direction direction)
         => direction switch
         {
@@ -75,6 +143,11 @@ public static class DirectionExtensions
             _ => null // fallback to null if no direction matched
         };
 
+    /// <summary>
+    /// Converts a direction to a normalized <see cref="Vector2"/>.
+    /// </summary>
+    /// <param name="direction">The direction to convert.</param>
+    /// <returns>A unit vector representing the direction, or <see cref="Vector2.zero"/> when none is set.</returns>
     public static Vector2 ToVector2(this Direction direction)
         => direction switch
         {
@@ -89,6 +162,11 @@ public static class DirectionExtensions
             _ => Vector2.zero // fallback for None or unrecognized combinations
         };
 
+    /// <summary>
+    /// Converts velocity to the incoming direction relative to an impacted object.
+    /// </summary>
+    /// <param name="velocity">The velocity vector to evaluate.</param>
+    /// <returns>The incoming direction derived from velocity signs.</returns>
     public static Direction ToIncomingDirection(this Vector2 velocity)
     {
         Direction dir = Direction.None;
@@ -99,6 +177,11 @@ public static class DirectionExtensions
         return dir;
     }
 
+    /// <summary>
+    /// Converts velocity to its movement direction.
+    /// </summary>
+    /// <param name="velocity">The velocity vector to evaluate.</param>
+    /// <returns>The movement direction derived from velocity signs.</returns>
     public static Direction ToDirection(this Vector2 velocity)
     {
         Direction dir = Direction.None;

@@ -3,8 +3,16 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
+/// <summary>
+/// Provides common initialization and visibility helpers for <see cref="MonoBehaviour"/> components.
+/// </summary>
 public static class MonoBehaviourExtensions
 {
+    /// <summary>
+    /// Determines whether the behaviour position is outside of the main camera viewport.
+    /// </summary>
+    /// <param name="behaviour">The behaviour to evaluate.</param>
+    /// <returns><see langword="true"/> when outside the viewport; otherwise <see langword="false"/>.</returns>
     public static bool IsOffScreen(this MonoBehaviour behaviour)
     {
         if (Camera.main == null) return false;
@@ -12,11 +20,25 @@ public static class MonoBehaviourExtensions
         return viewportPos.x < 0 || viewportPos.x > 1 || viewportPos.y < 0 || viewportPos.y > 1;
     }
 
+    /// <summary>
+    /// Gets the script file name from a full caller path.
+    /// </summary>
+    /// <param name="path">The full script path.</param>
+    /// <returns>The script file name, or empty string when path is null or empty.</returns>
     private static string GetScriptFileName(string path)
     {
         return string.IsNullOrEmpty(path) ? string.Empty : System.IO.Path.GetFileName(path);
     }
 
+    /// <summary>
+    /// Tries to initialize a required component from the same game object.
+    /// </summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="behaviour">The owner behaviour.</param>
+    /// <param name="component">The component reference to populate.</param>
+    /// <param name="isOptional">Whether missing component should be tolerated.</param>
+    /// <param name="callerScriptPath">Caller script path used for diagnostics.</param>
+    /// <returns><see langword="true"/> when the component is found; otherwise <see langword="false"/>.</returns>
     public static bool TryInitComponent<T>(this MonoBehaviour behaviour, ref T component, bool isOptional = false, [CallerFilePath] string callerScriptPath = null)
     {
         if (!behaviour.TryGetComponent(out component))
@@ -31,6 +53,16 @@ public static class MonoBehaviourExtensions
         return true;
     }
 
+    /// <summary>
+    /// Tries to initialize a component matching a predicate from the same game object.
+    /// </summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="behaviour">The owner behaviour.</param>
+    /// <param name="component">The component reference to populate.</param>
+    /// <param name="predicate">Predicate used to select one component instance.</param>
+    /// <param name="isOptional">Whether missing component should be tolerated.</param>
+    /// <param name="callerScriptPath">Caller script path used for diagnostics.</param>
+    /// <returns><see langword="true"/> when a matching component is found; otherwise <see langword="false"/>.</returns>
     public static bool TryInitComponent<T>(this MonoBehaviour behaviour, ref T component, Func<T, bool> predicate, bool isOptional = false, [CallerFilePath] string callerScriptPath = null)
         where T : class
     {

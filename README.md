@@ -2,6 +2,31 @@
 
 A Unity package containing common utility scripts and extension methods for Unity projects.
 
+## Repository Summary
+
+This package provides reusable runtime helpers focused on gameplay utilities, math/vector helpers, event invocation helpers, and physics/collision convenience components.
+
+### Runtime Types Overview
+
+- `ColorExtensions`: Color rounding and alpha manipulation helpers.
+- `DelegateExtensions`: Safe multicast delegate invocation helpers with aggregated results.
+- `Destructible`: Damageable pooled component with optional flash, fade, fragment, and knockback effects.
+- `Direction`: Flag enum for cardinal and diagonal directions.
+- `DirectionExtensions`: Direction checks, flips, and conversions to angles/vectors.
+- `FloatExtensions`: Float tolerance checks and timer decrement helper.
+- `IEnumerableOfBooleanExtensions`: Boolean sequence `All` and `Any` helpers.
+- `IgnoreCollisionsFromDirection`: Runtime component to ignore collisions by incoming direction and layer.
+- `MonoBehaviourExtensions`: Component initialization and visibility helpers for MonoBehaviours.
+- `Rigidbody2DExtensions`: Velocity assignment helpers with optional per-axis multipliers.
+- `Vector2Extensions`: Vector direction checks, near-equality checks, and angle helpers.
+
+### Delegates
+
+- `BeforeDestroyHandler`
+- `BeforeTakeDamageHandler`
+- `CollisionEntering`
+- `AddingTempIncomingDirectionToIgnore`
+
 ## Installation
 
 ### Install via Git URL
@@ -29,8 +54,6 @@ Alternatively, you can add the following line to your `Packages/manifest.json` f
 
 - **Runtime/**: Contains runtime scripts and extension classes
 - **Editor/**: Contains editor-specific utilities
-- **Tests/**: Contains unit tests for the package
-- **Documentation~/**: Contains package documentation
 
 ## Usage
 
