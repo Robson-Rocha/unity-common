@@ -7,6 +7,24 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
+# Unity-specific
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Unity meta files
+*.meta
+
+# Visual Studio cache directory
+.vs/
+
+# Rider cache directory
+.idea/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
