@@ -17,7 +17,8 @@
 [Uu]ser[Ss]ettings/
 
 # Unity meta files
-*.meta
+# NOTE: For Unity packages, .meta files MUST be committed
+# *.meta
 
 # Visual Studio cache directory
 .vs/
