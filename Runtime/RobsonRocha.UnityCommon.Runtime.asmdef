@@ -1,0 +1,14 @@
+{
+    "name": "RobsonRocha.UnityCommon.Runtime",
+    "rootNamespace": "RobsonRocha.UnityCommon",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

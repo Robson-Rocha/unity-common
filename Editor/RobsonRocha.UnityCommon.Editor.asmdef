@@ -1,0 +1,18 @@
+{
+    "name": "RobsonRocha.UnityCommon.Editor",
+    "rootNamespace": "RobsonRocha.UnityCommon.Editor",
+    "references": [
+        "GUID:b0c8b97b35b8c4c4aa38c4e3c3b6f6cf"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
