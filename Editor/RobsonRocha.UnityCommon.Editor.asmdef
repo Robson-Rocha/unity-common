@@ -2,6 +2,7 @@
     "name": "RobsonRocha.UnityCommon.Editor",
     "rootNamespace": "RobsonRocha.UnityCommon.Editor",
     "references": [
+        "GUID:3a4b5c6d7e8f90123456789012345b6c",
         "GUID:b0c8b97b35b8c4c4aa38c4e3c3b6f6cf"
     ],
     "includePlatforms": [

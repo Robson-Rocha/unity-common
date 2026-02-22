@@ -1,52 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// Provides optimized boolean aggregation helpers for <see cref="IEnumerable{Boolean}"/>.
-/// </summary>
-public static class IEnumerableOfBooleanExtensions
+namespace RobsonRocha.UnityCommon
 {
     /// <summary>
-    /// Determines whether all values in the sequence are <see langword="true"/>.
+    /// Provides optimized boolean aggregation helpers for <see cref="IEnumerable{Boolean}"/>.
     /// </summary>
-    /// <param name="enumerable">The sequence to evaluate.</param>
-    /// <returns><see langword="true"/> if every value is true; otherwise <see langword="false"/>.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="enumerable"/> is null.</exception>
-    public static bool All(this IEnumerable<bool> enumerable)
+    public static class IEnumerableOfBooleanExtensions
     {
-        if (enumerable == null)
+        /// <summary>
+        /// Determines whether all values in the sequence are <see langword="true"/>.
+        /// </summary>
+        /// <param name="enumerable">The sequence to evaluate.</param>
+        /// <returns><see langword="true"/> if every value is true; otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="enumerable"/> is null.</exception>
+        public static bool All(this IEnumerable<bool> enumerable)
         {
-            throw new ArgumentNullException(nameof(enumerable), "The enumerable cannot be null.");
-        }
-        foreach (bool item in enumerable)
-        {
-            if (!item)
+            if (enumerable == null)
             {
-                return false;
+                throw new ArgumentNullException(nameof(enumerable), "The enumerable cannot be null.");
             }
+            foreach (bool item in enumerable)
+            {
+                if (!item)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
-        return true;
-    }
 
-    /// <summary>
-    /// Determines whether at least one value in the sequence is <see langword="true"/>.
-    /// </summary>
-    /// <param name="enumerable">The sequence to evaluate.</param>
-    /// <returns><see langword="true"/> if any value is true; otherwise <see langword="false"/>.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="enumerable"/> is null.</exception>
-    public static bool Any(this IEnumerable<bool> enumerable)
-    {
-        if (enumerable == null)
+        /// <summary>
+        /// Determines whether at least one value in the sequence is <see langword="true"/>.
+        /// </summary>
+        /// <param name="enumerable">The sequence to evaluate.</param>
+        /// <returns><see langword="true"/> if any value is true; otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="enumerable"/> is null.</exception>
+        public static bool Any(this IEnumerable<bool> enumerable)
         {
-            throw new ArgumentNullException(nameof(enumerable), "The enumerable cannot be null.");
-        }
-        foreach (bool item in enumerable)
-        {
-            if (item)
+            if (enumerable == null)
             {
-                return true;
+                throw new ArgumentNullException(nameof(enumerable), "The enumerable cannot be null.");
             }
+            foreach (bool item in enumerable)
+            {
+                if (item)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
-        return false;
     }
 }
