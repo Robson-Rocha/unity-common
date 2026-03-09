@@ -44,12 +44,14 @@ namespace RobsonRocha.UnityCommon
         /// </summary>
         /// <param name="timer">The timer value to decrement.</param>
         /// <param name="deltaTime">Optional custom delta time. Uses <see cref="Time.deltaTime"/> when null.</param>
-        public static float DecrementTimer(this float timer, float? deltaTime = null)
+        /// <returns>The updated timer value after decrementing.</returns>
+        public static float DecrementTimer(this ref float timer, float? deltaTime = null)
         {
             if (timer != 0f)
+            {
                 timer = Mathf.Max(timer - (deltaTime ?? Time.deltaTime), 0f);
+            }
             return timer;
         }
-            
     }
 }

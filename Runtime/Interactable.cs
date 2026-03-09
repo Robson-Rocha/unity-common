@@ -11,7 +11,11 @@ namespace RobsonRocha.UnityCommon
         {
             if (this.TryInitComponent(ref detectable))
             {
-                detectable.Names.AddIfNotExists(nameof(Interactable));
+                detectable.DetectionPoints.AddIfNotExists(
+                    new DetectionPoint() 
+                    { 
+                        Name = nameof(Interactable)
+                    });
             }
         }
 

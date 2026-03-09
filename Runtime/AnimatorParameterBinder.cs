@@ -154,8 +154,11 @@ namespace RobsonRocha.UnityCommon
 
         void IterateTriggers()
         {
-            foreach (BoolTrigger trigger in _triggerBinds.Values.Where(trigger => trigger.Behavior != BoolTriggerBehavior.ManualTrigger))
+            foreach (var kvp in _triggerBinds)
             {
+                BoolTrigger trigger = kvp.Value;
+                if (trigger.Behavior == BoolTriggerBehavior.ManualTrigger) continue;
+
                 bool currentValue = trigger.ValueFactory();
                 bool previousValue = _previousBoolValues.TryGetValue(trigger.ParameterName, out previousValue) && previousValue;
                 bool shouldTrigger = (trigger.Behavior == BoolTriggerBehavior.TriggerWhenTrue && currentValue != previousValue && currentValue) ||

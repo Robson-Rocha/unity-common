@@ -9,10 +9,11 @@ namespace RobsonRocha.UnityCommon
     public class Detectable : MonoBehaviour
     {
         /// <summary>
-        /// Gets or sets the detectable names associated with the object.
-        /// This name is used by NearestDetector components to identify and filter detectable objects.
+        /// Gets or sets the collection of detection points used for analysis.
         /// </summary>
-        public List<string> Names = new();
+        /// <remarks>The list can be modified to add or remove detection points as needed. Changes to this
+        /// collection affect which points are considered during the detection process.</remarks>
+        public List<DetectionPoint> DetectionPoints = new();
 
         /// <summary>
         /// Gets or sets whether this object should be ignored by NearestDetector components, even if it matches the specified name and layer criteria.

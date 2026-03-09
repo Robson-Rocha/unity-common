@@ -94,7 +94,7 @@ namespace RobsonRocha.UnityCommon
             Color usedColor = color ?? BlinkColor;
             AnimationCurve usedCurve = curve ?? BlinkCurve;
 
-            if (usedDuration.IsAboveNearZero())
+            if (usedDuration.IsAboveNearZero() && usedFrequency.IsAboveNearZero())
             {
                 _blinkCoroutine = StartCoroutine(BlinkCoroutine(usedDuration, usedFrequency, usedColor, usedCurve));
             }
@@ -130,7 +130,7 @@ namespace RobsonRocha.UnityCommon
 
             while (_flashTimer.IsAboveNearZero())
             {
-                _flashTimer = _flashTimer.DecrementTimer();
+                _flashTimer.DecrementTimer();
                 float normalizedTime = 1f - Mathf.Clamp01(_flashTimer / duration);
                 float flashAmount = Mathf.Clamp01(curve.Evaluate(normalizedTime));
 
