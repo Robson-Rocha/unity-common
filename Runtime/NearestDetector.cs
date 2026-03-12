@@ -15,9 +15,9 @@ namespace RobsonRocha.UnityCommon
 
             Vector2 detectionOrigin = GetDetectionOrigin();
 
-            for (int i = 0; i < _targets.Length; i++)
+            for (int i = 0; i < Targets.Length; i++)
             {
-                Detectable t = _targets[i];
+                Detectable t = Targets[i];
                 
                 if (t == null || t.gameObject == null || t.Undetectable || 
                     !MatchesNameFilter(t) || !IsInLayerMask(t.gameObject.layer))

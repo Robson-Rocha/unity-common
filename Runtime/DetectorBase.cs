@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 namespace RobsonRocha.UnityCommon
@@ -34,11 +33,6 @@ namespace RobsonRocha.UnityCommon
         public Vector2 DetectionOffset = Vector2.zero;
 
         /// <summary>
-        /// Interval in seconds used to refresh the cached target list. Set it to zero for no refresh (only detects targets present at the start).
-        /// </summary>
-        public float RefreshTargetsIntervalInSeconds = 1f;
-
-        /// <summary>
         /// Layer mask to filter which layers can be detected. Use -1 (Everything) to include all layers.
         /// </summary>
         public LayerMask DetectionLayerMask = -1;
@@ -63,8 +57,9 @@ namespace RobsonRocha.UnityCommon
         /// </summary>
         public float? DistanceToTarget { get; protected set; }
 
-        protected Detectable[] _targets;
-        protected float _refreshTimer;
+        protected Detectable[] Targets => DetectableManager.Instance != null
+            ? DetectableManager.Instance.Targets
+            : System.Array.Empty<Detectable>();
 
         protected virtual void Start()
         {
@@ -72,7 +67,6 @@ namespace RobsonRocha.UnityCommon
             {
                 Origin = transform;
             }
-            RefreshTargets();
         }
 
         protected virtual void Update()
@@ -82,25 +76,10 @@ namespace RobsonRocha.UnityCommon
             DistanceToTarget = null;
             Target = null;
 
-            if (RefreshTargetsIntervalInSeconds.IsAboveNearZero())
-            {
-                _refreshTimer.DecrementTimer();
-                if (_refreshTimer.IsNearZero())
-                {
-                    RefreshTargets();
-                }
-            }
-
-            if (Origin == null || _targets == null || _targets.Length == 0)
+            if (Origin == null || Targets == null || Targets.Length == 0)
                 return;
 
             PerformDetection();
-        }
-
-        protected virtual void RefreshTargets()
-        {
-            _targets = GameObject.FindObjectsByType<Detectable>(FindObjectsSortMode.None);
-            _refreshTimer = RefreshTargetsIntervalInSeconds;
         }
 
         protected abstract void PerformDetection();
