@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace RobsonRocha.UnityCommon
 {
@@ -10,8 +11,6 @@ namespace RobsonRocha.UnityCommon
     [DefaultExecutionOrder(-30)]
     public class DetectableManager : SingletonMonoBehaviour<DetectableManager>
     {
-        protected override bool KeepInScene => true;
-
         /// <summary>
         /// Interval in seconds between full scene scans that rebuild the <see cref="Targets"/> cache.
         /// Set to zero to scan only once at startup.
@@ -32,6 +31,19 @@ namespace RobsonRocha.UnityCommon
             RefreshTargets();
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            SceneManager.sceneLoaded += HandleSceneLoaded;
+            SceneManager.sceneUnloaded += HandleSceneUnloaded;
+        }
+
+        protected void OnDisable()
+        {
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
+            SceneManager.sceneUnloaded -= HandleSceneUnloaded;
+        }
+
         private void Update()
         {
             if (!RefreshIntervalInSeconds.IsAboveNearZero())
@@ -43,14 +55,22 @@ namespace RobsonRocha.UnityCommon
         }
 
         /// <summary>
-        /// Forces an immediate rebuild of the <see cref="Targets"/> cache and resets the refresh timer.
+        /// Immediately refreshes the <see cref="Targets"/> cache by scanning the scene for all <see cref="Detectable"/> objects.
         /// </summary>
-        public void ForceRefresh() => RefreshTargets();
-
-        private void RefreshTargets()
+        public void RefreshTargets()
         {
             Targets = FindObjectsByType<Detectable>(FindObjectsSortMode.None);
             _refreshTimer = RefreshIntervalInSeconds;
+        }
+
+        private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            RefreshTargets();
+        }
+
+        private void HandleSceneUnloaded(Scene scene)
+        {
+            Targets = System.Array.Empty<Detectable>();
         }
     }
 }

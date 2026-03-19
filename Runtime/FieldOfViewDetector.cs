@@ -20,6 +20,12 @@ namespace RobsonRocha.UnityCommon
         /// </summary>
         public Func<Vector2> GetFacingDirection;
 
+        /// <summary>
+        /// Layer mask for geometry that blocks line of sight (walls, terrain, solid objects).
+        /// Combined with DetectionLayerMask so targets are always raycastable even when left unconfigured.
+        /// </summary>
+        public LayerMask LineOfSightObstacleMask;
+
         private float _cachedFieldOfViewAngle = -1f;
         private float _cachedHalfAngleCos;
 
@@ -40,15 +46,16 @@ namespace RobsonRocha.UnityCommon
 
             float nearestDistance = float.MaxValue;
             Detectable nearestTarget = null;
+            Vector2 nearestDirection = Vector2.zero;
 
             Vector2 detectionOrigin = GetDetectionOrigin();
+            int effectiveLineOfSightMask = LineOfSightObstacleMask | DetectionLayerMask;
 
             for (int i = 0; i < Targets.Length; i++)
             {
                 Detectable t = Targets[i];
-                
-                if (t == null || t.gameObject == null || t.Undetectable || 
-                    !MatchesNameFilter(t) || !IsInLayerMask(t.gameObject.layer))
+
+                if (t == null || t.gameObject == null || t.Undetectable || !IsInLayerMask(t.gameObject.layer) || !MatchesNameFilter(t))
                     continue;
 
                 Transform detectionTransform = GetDetectionTransform(t);
@@ -64,18 +71,22 @@ namespace RobsonRocha.UnityCommon
                 if (dotProduct < _cachedHalfAngleCos)
                     continue;
 
+                RaycastHit2D hit = Physics2D.Raycast(detectionOrigin, directionToTarget, distance, effectiveLineOfSightMask);
+                if (hit.collider == null || !hit.collider.transform.IsChildOf(t.transform))
+                    continue;
+
                 if (distance < nearestDistance)
                 {
                     nearestDistance = distance;
                     nearestTarget = t;
+                    nearestDirection = directionToTarget;
                 }
             }
 
             if (nearestTarget != null && nearestTarget.gameObject != null)
             {
                 IsDetected = true;
-                Transform detectionTransform = GetDetectionTransform(nearestTarget);
-                DirectionToTarget = ((Vector2)detectionTransform.position - detectionOrigin).normalized;
+                DirectionToTarget = nearestDirection;
                 DistanceToTarget = nearestDistance;
                 Target = nearestTarget.gameObject;
             }

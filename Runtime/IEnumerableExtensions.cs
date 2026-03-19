@@ -12,4 +12,17 @@ namespace RobsonRocha.UnityCommon
             }
         }
     }
+
+    public static class IDictionaryExtensions
+    {
+        public static TValue AddIfNotExists<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value)
+        {
+            if (!dict.TryGetValue(key, out TValue existingValue))
+            {
+                dict.Add(key, value);
+                return value;
+            }
+            return existingValue;
+        }
+    }
 }
