@@ -53,5 +53,14 @@ namespace RobsonRocha.UnityCommon
             }
             return timer;
         }
+
+        /// <summary>
+        /// Rolls a random value to determine if an event should occur based on the provided chance.
+        /// </summary>
+        /// <param name="chance">The chance value to evaluate.</param>
+        /// <param name="maxChance">The maximum value for the random roll.</param>
+        /// <returns><see langword="true"/> if the event occurs; otherwise <see langword="false"/>.</returns>
+        public static bool RollChance(this float chance, float maxChance = 1f) =>
+            chance.IsAboveNearZero() && Random.Range(0f, maxChance) < chance;
     }
 }

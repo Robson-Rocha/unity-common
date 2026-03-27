@@ -23,8 +23,13 @@ namespace RobsonRocha.UnityCommon
         // LateUpdate is called every frame, after all Update functions have been called
         void LateUpdate() 
         {
+            SetYSortingOrder(transform.position.y); 
+        }
+
+        public void SetYSortingOrder(float yPosition)
+        {
             // Set the sorting order based on the Y position (with offset), multiplying by 100 to allow for finer granularity
-            sr.sortingOrder = Mathf.RoundToInt(-(transform.position.y + _yOffset) * 100); 
+            sr.sortingOrder = Mathf.RoundToInt(-(yPosition + _yOffset) * 100); ;
         }
     }
 }
