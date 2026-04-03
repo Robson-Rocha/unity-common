@@ -9,5 +9,11 @@ namespace RobsonRocha.UnityCommon
         public float VolumeScale = 1f;
         public float PitchMin = 1f;
         public float PitchMax = 1f;
+
+        public void Play()
+        {
+            if (SoundManager.Instance == null || Clip == null) return;
+            SoundManager.Instance.PlaySfx(this);
+        }
     }
 }
