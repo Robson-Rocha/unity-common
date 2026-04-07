@@ -204,5 +204,12 @@ namespace RobsonRocha.UnityCommon
             IterateDictionary(_floatBinds, _previousFloatValues);
             IterateTriggers();
         }
+
+        void OnEnable()
+        {
+            _previousBoolValues.Clear();
+            _previousIntegerValues.Clear();
+            _previousFloatValues.Clear();            
+        }
     }
 }
