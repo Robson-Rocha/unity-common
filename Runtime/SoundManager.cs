@@ -9,6 +9,32 @@ namespace RobsonRocha.UnityCommon
     public class SoundManager : SingletonMonoBehaviour<SoundManager>
     {
         public int AudioSourcePoolSize = 10;
+
+        [SerializeField, Range(0f, 1f)]
+        private float GlobalSoundVolumeValue = 1f;
+        private float _lastAppliedGlobalSoundVolume = 1f;
+
+        public event EventHandler<GlobalSoundVolumeChangedEventArgs> GlobalSoundVolumeChanged;
+
+        public float GlobalSoundVolume
+        {
+            get => GlobalSoundVolumeValue;
+            set
+            {
+                float clampedVolume = Mathf.Clamp01(value);
+                if (Mathf.Approximately(_lastAppliedGlobalSoundVolume, clampedVolume))
+                {
+                    GlobalSoundVolumeValue = clampedVolume;
+                    return;
+                }
+
+                float previousVolume = _lastAppliedGlobalSoundVolume;
+                GlobalSoundVolumeValue = clampedVolume;
+                _lastAppliedGlobalSoundVolume = clampedVolume;
+                ApplyGlobalVolumeToAudioSources();
+                OnGlobalSoundVolumeChanged(previousVolume, _lastAppliedGlobalSoundVolume);
+            }
+        }
         
         private List<AudioSource> _audioSourcesPool;
         private readonly Dictionary<string, SoundEffect> _soundDictionary = new();
@@ -16,6 +42,8 @@ namespace RobsonRocha.UnityCommon
         protected override void OnEnable()
         {
             base.OnEnable();
+            _lastAppliedGlobalSoundVolume = Mathf.Clamp01(GlobalSoundVolumeValue);
+            GlobalSoundVolumeValue = _lastAppliedGlobalSoundVolume;
             if (_audioSourcesPool == null)
             {
                 _audioSourcesPool = new(AudioSourcePoolSize);
@@ -24,11 +52,19 @@ namespace RobsonRocha.UnityCommon
                     AddNewAudioSourceToPool();
                 }
             }
+
+            ApplyGlobalVolumeToAudioSources();
+        }
+
+        protected virtual void OnGlobalSoundVolumeChanged(float previousVolume, float currentVolume)
+        {
+            GlobalSoundVolumeChanged?.Invoke(this, new(previousVolume, currentVolume));
         }
 
         private AudioSource AddNewAudioSourceToPool()
         {
             AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.volume = GlobalSoundVolumeValue;
             _audioSourcesPool.Add(audioSource);
             return audioSource;
         }
@@ -105,6 +141,36 @@ namespace RobsonRocha.UnityCommon
         {
             yield return new WaitForSeconds(clipLength);
             onComplete();
+        }
+
+        private void ApplyGlobalVolumeToAudioSources()
+        {
+            if (_audioSourcesPool == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _audioSourcesPool.Count; i++)
+            {
+                _audioSourcesPool[i].volume = GlobalSoundVolumeValue;
+            }
+        }
+
+        private void OnValidate()
+        {
+            GlobalSoundVolume = GlobalSoundVolumeValue;
+        }
+    }
+
+    public sealed class GlobalSoundVolumeChangedEventArgs : EventArgs
+    {
+        public float PreviousVolume { get; }
+        public float CurrentVolume { get; }
+
+        public GlobalSoundVolumeChangedEventArgs(float previousVolume, float currentVolume)
+        {
+            PreviousVolume = previousVolume;
+            CurrentVolume = currentVolume;
         }
     }
 }

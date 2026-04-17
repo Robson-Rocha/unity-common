@@ -17,15 +17,47 @@ namespace RobsonRocha.UnityCommon
         private MusicTrack _currentMusic;
         private int _currentLoopCount;
         private Coroutine _fadeCoroutine;
+        [SerializeField, Range(0f, 1f)]
+        private float GlobalMusicVolumeValue = 1f;
+        private float _lastAppliedGlobalMusicVolume = 1f;
+
+        public event EventHandler<GlobalMusicVolumeChangedEventArgs> GlobalMusicVolumeChanged;
+
+        public float GlobalMusicVolume
+        {
+            get => GlobalMusicVolumeValue;
+            set
+            {
+                float clampedVolume = Mathf.Clamp01(value);
+                if (Mathf.Approximately(_lastAppliedGlobalMusicVolume, clampedVolume))
+                {
+                    GlobalMusicVolumeValue = clampedVolume;
+                    return;
+                }
+
+                float previousVolume = _lastAppliedGlobalMusicVolume;
+                GlobalMusicVolumeValue = clampedVolume;
+                _lastAppliedGlobalMusicVolume = clampedVolume;
+                ApplyGlobalVolumeToActiveSources(previousVolume, _lastAppliedGlobalMusicVolume);
+                OnGlobalMusicVolumeChanged(previousVolume, _lastAppliedGlobalMusicVolume);
+            }
+        }
 
         protected override void OnEnable()
         {
             base.OnEnable();
+            _lastAppliedGlobalMusicVolume = Mathf.Clamp01(GlobalMusicVolumeValue);
+            GlobalMusicVolumeValue = _lastAppliedGlobalMusicVolume;
             if (_currentAudioSource == null)
             {
                 _currentAudioSource = gameObject.AddComponent<AudioSource>();
                 _nextAudioSource = gameObject.AddComponent<AudioSource>();
             }
+        }
+
+        protected virtual void OnGlobalMusicVolumeChanged(float previousVolume, float currentVolume)
+        {
+            GlobalMusicVolumeChanged?.Invoke(this, new(previousVolume, currentVolume));
         }
 
         public void PlayMusic(string musicTrackNameAndSettings)
@@ -60,6 +92,11 @@ namespace RobsonRocha.UnityCommon
             if (music == null)
             {
                 Debug.LogWarning("Provided music track is null!");
+                return;
+            }
+
+            if (_currentMusic == music && _currentAudioSource != null && _currentAudioSource.isPlaying)
+            {
                 return;
             }
 
@@ -107,12 +144,12 @@ namespace RobsonRocha.UnityCommon
 
             _currentAudioSource.clip = music.Clip;
             _currentAudioSource.loop = music.LoopBehavior == MusicTrackLoopBehavior.Infinite;
-            _currentAudioSource.volume = fadeIn ? 0 : music.VolumeScale;
+            _currentAudioSource.volume = fadeIn ? 0 : GetEffectiveMusicVolume(music);
             _currentAudioSource.Play();
 
             if (fadeIn)
             {
-                yield return FadeIn(_currentAudioSource, music.VolumeScale, music.FadeInDuration);
+                yield return FadeIn(_currentAudioSource, music, music.FadeInDuration);
             }
         }
 
@@ -133,7 +170,7 @@ namespace RobsonRocha.UnityCommon
         {
             AudioSource oldSource = _currentAudioSource;
             float oldVolume = oldSource.volume;
-            float fadeOutDuration = _currentMusic?.FadeOutDuration ?? 1f;
+            float fadeOutDuration = _currentMusic != null ? _currentMusic.FadeOutDuration : 1f;
             float fadeInDuration = newMusic.FadeIn ? newMusic.FadeInDuration : 0f;
             float duration = Mathf.Max(fadeOutDuration, fadeInDuration);
 
@@ -154,11 +191,11 @@ namespace RobsonRocha.UnityCommon
 
                 if (fadeInDuration > 0 && elapsed < fadeInDuration)
                 {
-                    _currentAudioSource.volume = Mathf.Lerp(0, newMusic.VolumeScale, elapsed / fadeInDuration);
+                    _currentAudioSource.volume = Mathf.Lerp(0, GetEffectiveMusicVolume(newMusic), elapsed / fadeInDuration);
                 }
                 else if (fadeInDuration == 0)
                 {
-                    _currentAudioSource.volume = newMusic.VolumeScale;
+                    _currentAudioSource.volume = GetEffectiveMusicVolume(newMusic);
                 }
 
                 if (fadeOutDuration > 0 && elapsed < fadeOutDuration)
@@ -175,7 +212,7 @@ namespace RobsonRocha.UnityCommon
 
             oldSource.Stop();
             oldSource.volume = 0;
-            _currentAudioSource.volume = newMusic.VolumeScale;
+            _currentAudioSource.volume = GetEffectiveMusicVolume(newMusic);
         }
 
         private void StopCurrentImmediate()
@@ -187,8 +224,9 @@ namespace RobsonRocha.UnityCommon
             _currentMusic = null;
         }
 
-        private IEnumerator FadeIn(AudioSource source, float targetVolume, float duration)
+        private IEnumerator FadeIn(AudioSource source, MusicTrack music, float duration)
         {
+            float targetVolume = GetEffectiveMusicVolume(music);
             if (duration <= 0)
             {
                 source.volume = targetVolume;
@@ -199,10 +237,46 @@ namespace RobsonRocha.UnityCommon
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
+                targetVolume = GetEffectiveMusicVolume(music);
                 source.volume = Mathf.Lerp(0, targetVolume, elapsed / duration);
                 yield return null;
             }
             source.volume = targetVolume;
+        }
+
+        private float GetEffectiveMusicVolume(MusicTrack music)
+        {
+            if (music == null)
+            {
+                return 0;
+            }
+
+            return music.VolumeScale * GlobalMusicVolumeValue;
+        }
+
+        private void ApplyGlobalVolumeToActiveSources(float previousGlobalVolume, float newGlobalVolume)
+        {
+            if (_currentAudioSource == null)
+            {
+                return;
+            }
+
+            if (Mathf.Approximately(previousGlobalVolume, 0f))
+            {
+                if (_currentMusic != null && _currentAudioSource.isPlaying)
+                {
+                    _currentAudioSource.volume = GetEffectiveMusicVolume(_currentMusic);
+                }
+                return;
+            }
+
+            float multiplier = newGlobalVolume / previousGlobalVolume;
+            _currentAudioSource.volume = Mathf.Clamp01(_currentAudioSource.volume * multiplier);
+
+            if (_nextAudioSource != null)
+            {
+                _nextAudioSource.volume = Mathf.Clamp01(_nextAudioSource.volume * multiplier);
+            }
         }
 
         private IEnumerator FadeOut(AudioSource source, float duration)
@@ -289,7 +363,24 @@ namespace RobsonRocha.UnityCommon
 
         public string GetCurrentMusicName()
         {
-            return _currentMusic?.Name;
+            return _currentMusic != null ? _currentMusic.Name : null;
+        }
+
+        private void OnValidate()
+        {
+            GlobalMusicVolume = GlobalMusicVolumeValue;
+        }
+    }
+
+    public sealed class GlobalMusicVolumeChangedEventArgs : EventArgs
+    {
+        public float PreviousVolume { get; }
+        public float CurrentVolume { get; }
+
+        public GlobalMusicVolumeChangedEventArgs(float previousVolume, float currentVolume)
+        {
+            PreviousVolume = previousVolume;
+            CurrentVolume = currentVolume;
         }
     }
 }
